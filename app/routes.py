@@ -41,7 +41,37 @@ def index():
 
 @app.route('/login', methods=['POST'])
 def login():
-    return "Not implemented", 501
+    formulaire_connexion = (request.get_json())
+
+    # on récupère l'email
+    email = formulaire_connexion["email"]
+
+    #on vérifie si l'adresse mail est bonne
+    sql_request = f''' SELECT * FROM players WHERE players_email = "{email}" '''
+
+    players_avec_cet_email = sql_select(sql_request)
+
+    if len(players_avec_cet_email) == 0:
+        return "Email non existant", 501
+
+    password = formulaire_connexion["password"]
+
+    sql_request = f'''SELECT * FROM players WHERE players_email = "{email}" AND players_password = "{password}"'''
+
+    players_avec_son_mdp = sql_select(sql_request)
+
+    if len(players_avec_son_mdp) == 0:
+        return "Mot de passe éronné ", 501
+
+
+
+    print(players_avec_son_mdp[0]["players_id"])
+    Id = {"id": players_avec_son_mdp[0]["players_id"]}
+
+    return jsonify(Id), 200
+
+
+
 
 
 @app.route('/signup', methods=['POST'])
